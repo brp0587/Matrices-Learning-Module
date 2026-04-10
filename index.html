@@ -436,7 +436,7 @@
 
     <footer class="page-footer">
         <div class="visit-counter">
-            👁️ Page Visits: <span id="visit-count">0</span>
+            👁️ Page Visits: <span id="visit-count">...</span>
         </div>
         <div class="copyright">
             &copy; Prepared by Bhavin R Patel, Lecturer Mathematics
@@ -444,16 +444,20 @@
     </footer>
 
     <script>
-        // Page Visit Counter Logic
+        // Global Page Visit Counter Logic
         window.addEventListener('DOMContentLoaded', (event) => {
-            let count = localStorage.getItem('matrix_page_view_count');
-            if (count === null) {
-                count = 1;
-            } else {
-                count = parseInt(count) + 1;
-            }
-            localStorage.setItem('matrix_page_view_count', count);
-            document.getElementById('visit-count').innerText = count;
+            const namespace = 'bhavin-matrix-unit1'; // Unique namespace for your page
+            const key = 'visits';
+            
+            fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('visit-count').innerText = data.count;
+                })
+                .catch(error => {
+                    console.error('Error fetching global counter:', error);
+                    document.getElementById('visit-count').innerText = '1+'; // Fallback display
+                });
         });
 
         // Initialize dynamic grids
@@ -626,12 +630,50 @@
                 else if (op === 'adjA') {
                     if (A.length !== A[0].length) return renderOutput("<span style='color:#FF6584'>Error: Square Matrix required.</span>");
                     let adj = getAdjoint(A);
+                    
                     if (A.length === 2) {
                         steps.push(`<b>Step 1 (પગલું ૧):</b> For 2x2, swap principal diagonal elements and change signs of the other diagonal.<br>મુખ્ય વિકર્ણના ઘટકો બદલો, અને બાકીના ચિહ્નો બદલો.`);
+                        steps.push(`\\[ adj A = ${formatLatex(adj)} \\]`);
+                    } 
+                    else if (A.length === 3) {
+                        steps.push(`<b>Step 1 (પગલું ૧):</b> Calculate the Cofactors for each element (દરેક ઘટકના સહઅવયવ શોધો).`);
+                        
+                        let c11 = (A[1][1]*A[2][2]) - (A[1][2]*A[2][1]);
+                        let c12 = -((A[1][0]*A[2][2]) - (A[1][2]*A[2][0]));
+                        let c13 = (A[1][0]*A[2][1]) - (A[1][1]*A[2][0]);
+                        let c21 = -((A[0][1]*A[2][2]) - (A[0][2]*A[2][1]));
+                        let c22 = (A[0][0]*A[2][2]) - (A[0][2]*A[2][0]);
+                        let c23 = -((A[0][0]*A[2][1]) - (A[0][1]*A[2][0]));
+                        let c31 = (A[0][1]*A[1][2]) - (A[0][2]*A[1][1]);
+                        let c32 = -((A[0][0]*A[1][2]) - (A[0][2]*A[1][0]));
+                        let c33 = (A[0][0]*A[1][1]) - (A[0][1]*A[1][0]);
+
+                        let cofMat = [
+                            [c11, c12, c13],
+                            [c21, c22, c23],
+                            [c31, c32, c33]
+                        ];
+
+                        let htmlMinors = `<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 1rem; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary); margin: 15px 0;">`;
+                        htmlMinors += `<div>$C_{11} = +(${A[1][1]}\\times${A[2][2]} - ${A[1][2]}\\times${A[2][1]}) = ${c11}$</div>`;
+                        htmlMinors += `<div>$C_{12} = -(${A[1][0]}\\times${A[2][2]} - ${A[1][2]}\\times${A[2][0]}) = ${c12}$</div>`;
+                        htmlMinors += `<div>$C_{13} = +(${A[1][0]}\\times${A[2][1]} - ${A[1][1]}\\times${A[2][0]}) = ${c13}$</div>`;
+                        htmlMinors += `<div>$C_{21} = -(${A[0][1]}\\times${A[2][2]} - ${A[0][2]}\\times${A[2][1]}) = ${c21}$</div>`;
+                        htmlMinors += `<div>$C_{22} = +(${A[0][0]}\\times${A[2][2]} - ${A[0][2]}\\times${A[2][0]}) = ${c22}$</div>`;
+                        htmlMinors += `<div>$C_{23} = -(${A[0][0]}\\times${A[2][1]} - ${A[0][1]}\\times${A[2][0]}) = ${c23}$</div>`;
+                        htmlMinors += `<div>$C_{31} = +(${A[0][1]}\\times${A[1][2]} - ${A[0][2]}\\times${A[1][1]}) = ${c31}$</div>`;
+                        htmlMinors += `<div>$C_{32} = -(${A[0][0]}\\times${A[1][2]} - ${A[0][2]}\\times${A[1][0]}) = ${c32}$</div>`;
+                        htmlMinors += `<div>$C_{33} = +(${A[0][0]}\\times${A[1][1]} - ${A[0][1]}\\times${A[1][0]}) = ${c33}$</div>`;
+                        htmlMinors += `</div>`;
+                        
+                        steps.push(htmlMinors);
+                        steps.push(`<b>Step 2 (પગલું ૨):</b> Form Cofactor Matrix (સહઅવયવજ શ્રેણિક બનાવો).`);
+                        steps.push(`\\[ C = ${formatLatex(cofMat)} \\]`);
+                        steps.push(`<b>Step 3 (પગલું ૩):</b> Transpose the matrix to get Adjoint $C^T$ (પરિવર્ત કરો).`);
+                        steps.push(`\\[ adj A = ${formatLatex(adj)} \\]`);
                     } else {
-                        steps.push(`<b>Step 1 (પગલું ૧):</b> Calculate cofactor matrix and transpose it.<br>સહઅવયવજ શ્રેણિક શોધી તેનો પરિવર્ત કરો.`);
+                        steps.push(`\\[ adj A = ${formatLatex(adj)} \\]`);
                     }
-                    steps.push(`\\[ adj A = ${formatLatex(adj)} \\]`);
                 }
                 else if (op === 'invA') {
                     let det = getDet(A);
