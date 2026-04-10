@@ -437,7 +437,42 @@
         </div>
 
     </div>
+<div style="background-color: #f0fdf4; padding: 20px; border-radius: 10px; margin: 40px 0; border: 1px solid #bbf7d0;">
+    <h3 style="color: #166534; margin-top: 0;">📝 Quick Check / ઝડપી ચકાસણી</h3>
+    <p><strong>1. If a matrix has 3 rows and 2 columns, what is its order?</strong></p>
+    <div style="margin-bottom: 15px;">
+        <input type="radio" id="q1a" name="q1" value="wrong"> <label for="q1a">2 × 3</label><br>
+        <input type="radio" id="q1b" name="q1" value="correct"> <label for="q1b">3 × 2</label><br>
+        <input type="radio" id="q1c" name="q1" value="wrong"> <label for="q1c">6</label>
+    </div>
 
+    <button onclick="checkQuiz()" style="background-color: #16a34a; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        Check Answer (જવાબ ચકાસો)
+    </button>
+
+    <p id="quiz-feedback" style="margin-top: 15px; font-weight: bold;"></p>
+</div>
+
+<script>
+function checkQuiz() {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const feedback = document.getElementById('quiz-feedback');
+    
+    if (!q1) {
+        feedback.style.color = "#ca8a04";
+        feedback.innerText = "Please select an answer first! (કૃપા કરીને પહેલા જવાબ પસંદ કરો!)";
+        return;
+    }
+    
+    if (q1.value === "correct") {
+        feedback.style.color = "#16a34a";
+        feedback.innerText = "✅ Correct! Rows come first, then columns. (સાચું!)";
+    } else {
+        feedback.style.color = "#dc2626";
+        feedback.innerText = "❌ Incorrect. Remember: Order is (Rows × Columns). (ખોટું. યાદ રાખો: હાર × સ્તંભ)";
+    }
+}
+</script>
     <footer class="page-footer">
         <div class="visit-counter">
             👁️ Page Visits: <span id="visit-count">...</span>
